@@ -58,12 +58,13 @@ def splitLost(data):
     lost15 = [-1] * 1001
     lastlost15 = 0
     for line in data:
-        if line[-4][0] =='0':
-            lastlost04 +=1
-            lost04[ceil(float(line[1]))] = lastlost04
-        elif line[-4][0] =='1':
-            lastlost15 +=1
-            lost15[ceil(float(line[1]))] = lastlost15
+        if line[0] == 'd':
+            if line[-4][0] =='0':
+                lastlost04 +=1
+                lost04[ceil(float(line[1]))] = lastlost04
+            elif line[-4][0] =='1':
+                lastlost15 +=1
+                lost15[ceil(float(line[1]))] = lastlost15
     return adjustArray(lost04, -1), adjustArray(lost15, -1)
 
 def splitRtt(data):
@@ -201,6 +202,7 @@ def analyzeRTT():
 
 def analyzeGoodput():
     global goodputDict04, goodputDict15
+    print(goodputDict04)
     colors = ['c', 'm', 'y', 'g', 'b', 'r']
     for key in goodputDict04.keys():
         plt.plot(range(1001), goodputDict04[key], label=key+'04', c=colors[-1])
@@ -228,20 +230,6 @@ def analyzeLost():
     plt.title("Lost/s")
     plt.legend()
     plt.show()
-
-def derivate(arr):
-    arr2 = [0] * len(arr)
-    for i in range(1, len(arr)):
-        arr2[i] = arr[i] / i
-    arr2[0] = arr[0]
-    return arr2
-
-def diffrence(arr1):
-    arr2 = [0] * len(arr1)
-    for i in range(1, len(arr1)):
-        arr2[i] = arr1[i] - arr1[i-1]
-    arr2[0] = arr1[0]
-    return arr2
 
 
 run()
