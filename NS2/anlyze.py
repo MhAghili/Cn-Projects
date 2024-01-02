@@ -30,7 +30,7 @@ def splitCWND(data):
     cwnds04 = [-1] * 1001
     cwnds15 = [-1] * 1001
     for line in data:
-        if "cwnd" in line:
+        if "cwnd_" in line:
             indexes = [0.6]
             if line[1] == '0':
                 cwnds04[ceil(float(line[0]))] = float(line[6])
@@ -45,7 +45,7 @@ def splitAcks(data):
     acks04 = ['none'] * 1001
     acks15 = ['none'] * 1001
     for line in data:
-        if "ack" in line:
+        if "ack_" in line:
             if line[1] == '0':
                 acks04[ceil(float(line[0]))] = float(line[-1])
             else:
@@ -70,7 +70,7 @@ def splitRtt(data):
     rtt04 = [-1] * 1001
     rtt15 = [-1] * 1001
     for line in data:
-        if "rtt" in line:
+        if "rtt_" in line:
             if line[1] == '0':
                 rtt04[ceil(float(line[0]))] = float(line[-1])
             else:
