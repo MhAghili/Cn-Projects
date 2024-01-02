@@ -2,8 +2,8 @@ import matplotlib.pyplot as plt
 from math import ceil
 import os
 
-cwnfDict15 = {"newreno": [0] * 1001, "vegas": [0] * 1001, "tahoe": [0] * 1001}
-cwnfDict04 = {"newreno": [0] * 1001, "vegas": [0] * 1001, "tahoe": [0] * 1001}
+cwndDict15 = {"newreno": [0] * 1001, "vegas": [0] * 1001, "tahoe": [0] * 1001}
+cwndDict04 = {"newreno": [0] * 1001, "vegas": [0] * 1001, "tahoe": [0] * 1001}
 goodputDict04 = {"newreno": [0] * 1001, "vegas": [0] * 1001, "tahoe": [0] * 1001}
 goodputDict15 = {"newreno": [0] * 1001, "vegas": [0] * 1001, "tahoe": [0] * 1001}
 rttDict04 = {"newreno": [0] * 1001, "vegas": [0] * 1001, "tahoe": [0] * 1001}
@@ -12,7 +12,7 @@ lostDict04 = {"newreno": [0] * 1001, "vegas": [0] * 1001, "tahoe": [0] * 1001}
 lostDict15 = {"newreno": [0] * 1001, "vegas": [0] * 1001, "tahoe": [0] * 1001}
 
 def splitFile(filename):
-    Lines = []
+    lines = []
     file = open(filename, 'r')
     line = file.readline()
     while line:
@@ -141,9 +141,9 @@ def runOneEpoch():
     os.system("ns vegas_tcp.tcl")
     os.system("ns newreno_tcp.tcl")
 
-    newRenoData = splitFile("newrenoTrace.tr")
-    vegasData = splitFile("vegasTrace.tr")
     tahoeData = splitFile("tahoeTrace.tr")
+    vegasData = splitFile("vegasTrace.tr")
+    newRenoData = splitFile("newrenoTrace.tr")
 
     addCwndDatas(newRenoData, vegasData, tahoeData)
     addGoodputDatas(newRenoData, vegasData, tahoeData)
