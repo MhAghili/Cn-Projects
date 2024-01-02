@@ -58,15 +58,12 @@ def splitLost(data):
     lost15 = [-1] * 1001
     lastlost15 = 0
     for line in data:
-        if "lost" in line:
-            indexes = [0.6]
-            if line[1] == '0':
-                lost04[ceil(float(line[0]))] = float(line[6]) - lastlost04
-                lastlost04 = float(line[6])
-            else:
-                lost15[ceil(float(line[0]))] = float(line[6]) - lastlost15
-                lastlost15 = float(line[6])
-
+        if line[-4][0] =='0':
+            lastlost04 +=1
+            lost04[ceil(float(line[1]))] = lastlost04
+        elif line[-4][0] =='1':
+            lastlost15 +=1
+            lost15[ceil(float(line[1]))] = lastlost15
     return adjustArray(lost04, -1), adjustArray(lost15, -1)
 
 def splitRtt(data):
@@ -122,6 +119,7 @@ def addRttDatas(newRenoData, vegasData, tahoeData):
         rttDict15["newreno"][i] += newRenoDataRtt15[i]
         rttDict15["vegas"][i] += vegasDataRtt15[i]
         rttDict15["tahoe"][i] += tahoeDataRtt15[i]
+
 def addLostDatas(newRenoData, vegasData, tahoeData):
     global lostDict04, lostDict15
     newRenoDataLost04, newRenoDataLost15 = splitLost(newRenoData)
@@ -151,7 +149,7 @@ def runOneEpoch():
     addLostDatas(newRenoData, vegasData, tahoeData)
 
 def calcAvgVars():
-    global cwndDict04, cwndDict15, goodputDict04, goodputDict15, rttDict04, rttDict15, lostDict04, lostDict15
+    global cwndDict04, cwndDict15, goodputDict04, goodputDict15
     for key in cwndDict04:
         for i in range(1001):
             cwndDict04[key][i] /= 10
@@ -172,7 +170,7 @@ def run():
 def analyzeCWND():
     global cwndDict04, cwndDict15
     colors = ['c', 'm', 'y', 'g', 'b', 'r']
-    for key in cwndDict04:
+    for key in cwndDict04.keys():
         plt.plot(range(1001), cwndDict04[key], label=key+'04', c=colors[-1])
         colors.pop()
         plt.plot(range(1001), cwndDict15[key], label=key+'15', c=colors[-1])
@@ -189,7 +187,7 @@ def analyzeCWND():
 def analyzeRTT():
     global rttDict04, rttDict15
     colors = ['c', 'm', 'y', 'g', 'b', 'r']
-    for key in rttDict04:
+    for key in rttDict04.keys():
         plt.plot(range(1001), rttDict04[key], label=key+'04', c=colors[-1])
         colors.pop()
         plt.plot(range(1001), rttDict15[key], label=key+'15', c=colors[-1])
@@ -204,7 +202,7 @@ def analyzeRTT():
 def analyzeGoodput():
     global goodputDict04, goodputDict15
     colors = ['c', 'm', 'y', 'g', 'b', 'r']
-    for key in goodputDict04:
+    for key in goodputDict04.keys():
         plt.plot(range(1001), goodputDict04[key], label=key+'04', c=colors[-1])
         colors.pop()
         plt.plot(range(1001), goodputDict15[key], label=key+'15', c=colors[-1])
@@ -219,7 +217,7 @@ def analyzeGoodput():
 def analyzeLost():
     global lostDict04, lostDict15
     colors = ['c', 'm', 'y', 'g', 'b', 'r']
-    for key in lostDict04:
+    for key in lostDict04.keys():
         plt.plot(range(1001), lostDict04[key], label=key+'04', c=colors[-1])
         colors.pop()
         plt.plot(range(1001), lostDict15[key], label=key+'15', c=colors[-1])
