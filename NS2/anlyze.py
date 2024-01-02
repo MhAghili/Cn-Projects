@@ -162,6 +162,15 @@ def calcAvgVars():
             lostDict04[key][i] /= 10
             lostDict15[key][i] /= 10
 
+def derivate(arr):
+    arr2 = [0] * len(arr)
+    for i in range(1, len(arr)):
+        arr2[i] = arr[i] / i
+    arr2[0] = arr[0]
+    return arr2
+
+
+
 def run():
     for i in range(10):
         print("Epoch: ", i, " started")
@@ -202,12 +211,11 @@ def analyzeRTT():
 
 def analyzeGoodput():
     global goodputDict04, goodputDict15
-    print(goodputDict04)
     colors = ['c', 'm', 'y', 'g', 'b', 'r']
     for key in goodputDict04.keys():
-        plt.plot(range(1001), goodputDict04[key], label=key+'04', c=colors[-1])
+        plt.plot(range(1001),derivate(goodputDict04[key]), label=key+'04', c=colors[-1])
         colors.pop()
-        plt.plot(range(1001), goodputDict15[key], label=key+'15', c=colors[-1])
+        plt.plot(range(1001), derivate(goodputDict15[key]), label=key+'15', c=colors[-1])
         colors.pop()
 
     plt.xlabel("Time")
@@ -220,9 +228,9 @@ def analyzeLost():
     global lostDict04, lostDict15
     colors = ['c', 'm', 'y', 'g', 'b', 'r']
     for key in lostDict04.keys():
-        plt.plot(range(1001), lostDict04[key], label=key+'04', c=colors[-1])
+        plt.plot(range(1001), derivate(lostDict04[key]), label=key+'04', c=colors[-1])
         colors.pop()
-        plt.plot(range(1001), lostDict15[key], label=key+'15', c=colors[-1])
+        plt.plot(range(1001), derivate(lostDict15[key]), label=key+'15', c=colors[-1])
         colors.pop()
 
     plt.xlabel("Time")
