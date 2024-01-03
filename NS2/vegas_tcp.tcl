@@ -34,8 +34,6 @@ set n6 [$ns node]
 set rndVar1 [$randVar value]
 set rndVar2 [$randVar value]
 
-puts [expr {double (round(100*$rndVar1)/100)}]
-puts [expr {double (round(100*$rndVar2)/100)}]
 
 $ns duplex-link $n1 $n3 100Mb 5ms DropTail
 $ns duplex-link $n2 $n3 100Mb [expr {double(round(100*$rndVar1))/100}]ms DropTail
@@ -71,16 +69,12 @@ $source2 set fid_ 2
 
 $source1 attach $tracefilel
 $source1 tracevar cwnd_
-$source1 tracevar ssthresh_
 $source1 tracevar ack_
-$source1 tracevar maxseq_
 $source1 tracevar rtt_
 
 $source2 attach $tracefilel
 $source2 tracevar cwnd_
-$source2 tracevar ssthresh_
 $source2 tracevar ack_
-$source2 tracevar maxseq_
 $source2 tracevar rtt_
 
 set myftp1 [new Application/FTP]

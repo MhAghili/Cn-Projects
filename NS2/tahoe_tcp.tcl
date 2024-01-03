@@ -17,9 +17,9 @@ $randVar set min_ 5.0
 $randVar set max_ 25.0
 
 proc finish {} {
-    global ns namefile  ;# Fix variable name to match the open command
+    global ns namefile  ;
     $ns flush-trace
-    close $namefile   ;# Fix variable name to match the open command
+    close $namefile   
     exit 0
 }
 
@@ -34,14 +34,13 @@ set n6 [$ns node]
 set rndVar1 [$randVar value]
 set rndVar2 [$randVar value]
 
-puts [expr {double (round(100*$rndVar1)/100)}]
-puts [expr {double (round(100*$rndVar2)/100)}]
 
 $ns duplex-link $n1 $n3 100Mb 5ms DropTail
 $ns duplex-link $n2 $n3 100Mb [expr {double(round(100*$rndVar1))/100}]ms DropTail
 $ns duplex-link $n3 $n4 100Kb 1ms DropTail
 $ns duplex-link $n4 $n5 100Mb 5ms DropTail
 $ns duplex-link $n4 $n6 100Mb [expr {double(round(100*$rndVar2))/100}]ms DropTail
+
 $ns queue-limit $n3 $n4 10
 $ns queue-limit $n4 $n3 10
 
@@ -71,16 +70,12 @@ $source2 set fid_ 2
 
 $source1 attach $tracefilel
 $source1 tracevar cwnd_
-$source1 tracevar ssthresh_
 $source1 tracevar ack_
-$source1 tracevar maxseq_
 $source1 tracevar rtt_
 
 $source2 attach $tracefilel
 $source2 tracevar cwnd_
-$source2 tracevar ssthresh_
 $source2 tracevar ack_
-$source2 tracevar maxseq_
 $source2 tracevar rtt_
 
 set myftp1 [new Application/FTP]
