@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt 
 from math import ceil
 import os
-size = 42
+size = 1001 # size of trace file
 
 cwndDict2_6 = {"newreno": [0] * size, "vegas": [0] * size, "tahoe": [0] * size}
 cwndDict1_5 = {"newreno": [0] * size, "vegas": [0] * size, "tahoe": [0] * size}
@@ -188,7 +188,7 @@ def divide_by_index(arr):
 
 def CwndDiagram():
     global cwndDict1_5, cwndDict2_6
-    colors = ['c', 'm', 'y', 'g', 'b', 'r']
+    colors = ['g', 'b', 'm', 'c', 'y', 'r']
     for key in cwndDict1_5.keys():
         plt.plot(range(size), cwndDict1_5[key], label=key+'1_5', c=colors[-1])
         colors.pop()
@@ -205,7 +205,7 @@ def CwndDiagram():
 
 def RttDiagram():
     global rttDict1_5, rttDict2_6
-    colors = ['c', 'm', 'y', 'g', 'b', 'r']
+    colors = ['g', 'b', 'm', 'c', 'y', 'r']
     for key in rttDict1_5.keys():
         plt.plot(range(size), rttDict1_5[key], label=key+'1_5', c=colors[-1])
         colors.pop()
@@ -220,7 +220,7 @@ def RttDiagram():
 
 def GPDiagram():
     global goodputDict1_5, goodputDict2_6
-    colors = ['c', 'm', 'y', 'g', 'b', 'r']
+    colors = ['g', 'b', 'm', 'c', 'y', 'r']
     for key in goodputDict1_5.keys():
         plt.plot(range(size),divide_by_index(goodputDict1_5[key]), label=key+'1_5', c=colors[-1])
         colors.pop()
@@ -235,7 +235,7 @@ def GPDiagram():
 
 def LossDiagram():
     global lostDict1_5, lostDict2_6
-    colors = ['c', 'm', 'y', 'g', 'b', 'r']
+    colors = ['g', 'b', 'm', 'c', 'y', 'r']
     for key in lostDict1_5.keys():
         plt.plot(range(size), divide_by_index(lostDict1_5[key]), label=key+'1_5', c=colors[-1])
         colors.pop()
