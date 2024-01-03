@@ -1,15 +1,16 @@
 import matplotlib.pyplot as plt 
 from math import ceil
 import os
+size = 42
 
-cwnd_2_to_6 = {"newreno": [0] * 1001, "vegas": [0] * 1001, "tahoe": [0] * 1001}
-cwndDict04 = {"newreno": [0] * 1001, "vegas": [0] * 1001, "tahoe": [0] * 1001}
-goodputDict04 = {"newreno": [0] * 1001, "vegas": [0] * 1001, "tahoe": [0] * 1001}
-goodputDict15 = {"newreno": [0] * 1001, "vegas": [0] * 1001, "tahoe": [0] * 1001}
-rttDict04 = {"newreno": [0] * 1001, "vegas": [0] * 1001, "tahoe": [0] * 1001}
-rttDict15 = {"newreno": [0] * 1001, "vegas": [0] * 1001, "tahoe": [0] * 1001}
-lostDict04 = {"newreno": [0] * 1001, "vegas": [0] * 1001, "tahoe": [0] * 1001}
-lostDict15 = {"newreno": [0] * 1001, "vegas": [0] * 1001, "tahoe": [0] * 1001}
+cwndDict2_6 = {"newreno": [0] * size, "vegas": [0] * size, "tahoe": [0] * size}
+cwndDict1_5 = {"newreno": [0] * size, "vegas": [0] * size, "tahoe": [0] * size}
+goodputDict1_5 = {"newreno": [0] * size, "vegas": [0] * size, "tahoe": [0] * size}
+goodputDict2_6 = {"newreno": [0] * size, "vegas": [0] * size, "tahoe": [0] * size}
+rttDict1_5 = {"newreno": [0] * size, "vegas": [0] * size, "tahoe": [0] * size}
+rttDict2_6 = {"newreno": [0] * size, "vegas": [0] * size, "tahoe": [0] * size}
+lostDict1_5 = {"newreno": [0] * size, "vegas": [0] * size, "tahoe": [0] * size}
+lostDict2_6 = {"newreno": [0] * size, "vegas": [0] * size, "tahoe": [0] * size}
 
 def splitFile(filename):
     lines = []
@@ -20,122 +21,127 @@ def splitFile(filename):
         line = file.readline()
     return lines
 
-def adjustArray(arr, defaultVal):
-    for i in range(len(arr)):
-        if arr[i] == defaultVal:
-            arr[i] = arr[i-1] if i != 0 else 0
-    return arr
 
 def splitCWND(data):
-    cwnds04 = [-1] * 1001
-    cwnds15 = [-1] * 1001
+    cwnds1_5 = [-1] * size 
+    cwnds2_6 = [-1] * size
     for line in data:
         if "cwnd_" in line:
-            indexes = [0.6]
             if line[1] == '0':
-                cwnds04[ceil(float(line[0]))] = float(line[6])
+                cwnds1_5[ceil(float(line[0]))] = float(line[6])
             else:
-                cwnds15[ceil(float(line[0]))] = float(line[6])
-    cwnds04 = adjustArray(cwnds04, -1)
-    cwnds15 = adjustArray(cwnds15, -1)
-    return cwnds04, cwnds15
-
-
-def splitAcks(data):
-    acks04 = ['none'] * 1001
-    acks15 = ['none'] * 1001
-    for line in data:
-        if "ack_" in line:
-            if line[1] == '0':
-                acks04[ceil(float(line[0]))] = float(line[-1])
-            else:
-                acks15[ceil(float(line[0]))] = float(line[-1])
-    return adjustArray(acks04, 'none'), adjustArray(acks15, 'none')
-
-def splitLost(data):
-    lost04 = [-1] * 1001
-    lastlost04 = 0
-    lost15 = [-1] * 1001
-    lastlost15 = 0
-    for line in data:
-        if line[0] == 'd':
-            if line[-4][0] =='0':
-                lastlost04 +=1
-                lost04[ceil(float(line[1]))] = lastlost04
-            elif line[-4][0] =='1':
-                lastlost15 +=1
-                lost15[ceil(float(line[1]))] = lastlost15
-    return adjustArray(lost04, -1), adjustArray(lost15, -1)
+                cwnds2_6[ceil(float(line[0]))] = float(line[6])
+    cwnds1_5 = arrange(cwnds1_5, -1)
+    cwnds2_6 = arrange(cwnds2_6, -1)
+    return cwnds1_5, cwnds2_6
 
 def splitRtt(data):
-    rtt04 = [-1] * 1001
-    rtt15 = [-1] * 1001
+    rtt1_5 = [-1] * size
+    rtt2_6 = [-1] * size
     for line in data:
         if "rtt_" in line:
             if line[1] == '0':
-                rtt04[ceil(float(line[0]))] = float(line[-1])
+                rtt1_5[ceil(float(line[0]))] = float(line[-1])
             else:
-                rtt15[ceil(float(line[0]))] = float(line[-1])
-    return adjustArray(rtt04, -1), adjustArray(rtt15, -1)
+                rtt2_6[ceil(float(line[0]))] = float(line[-1])
+    return arrange(rtt1_5, -1), arrange(rtt2_6, -1)
+
+
+def splitAcks(data): 
+    acks1_5 = ['none'] * size
+    acks2_6 = ['none'] * size
+    for line in data:
+        if "ack_" in line:
+            if line[1] == '0':
+                acks1_5[ceil(float(line[0]))] = float(line[-1])
+            else:
+                acks2_6[ceil(float(line[0]))] = float(line[-1])
+    return arrange(acks1_5, 'none'), arrange(acks2_6, 'none')
+
+def splitLost(data):
+    lost1_5 = [-1] * size
+    lastlost1_5 = 0
+    lost2_6 = [-1] * size
+    lastlost2_6 = 0
+    for line in data:
+        if line[0] == 'd':
+            if line[-4][0] =='0':
+                lastlost1_5 +=1
+                lost1_5[ceil(float(line[1]))] = lastlost1_5
+            elif line[-4][0] =='1':
+                lastlost2_6 +=1
+                lost2_6[ceil(float(line[1]))] = lastlost2_6
+    return arrange(lost1_5, -1), arrange(lost2_6, -1)
+
+
+
+def arrange(arr, defaultVal):
+    for i in range(len(arr)):
+        if arr[i] == defaultVal:
+            if i != 0:
+                arr[i] = arr[i-1]
+            else:
+                arr[i] = 0
+    return arr
 
 def addCwndDatas(newRenoData, vegasData, tahoeData):
-    global cwndDict04, cwnd_2_to_6
-    newRenoDataCwnd04, newRenoDataCwnd15 = splitCWND(newRenoData)
-    vegasDataCwnd04, vegasDataCwnd15 = splitCWND(vegasData)
-    tahoeDataCwnd04, tahoeDataCwnd15 = splitCWND(tahoeData)
+    global cwndDict1_5, cwndDict2_6
+    newRenoDataCwnd1_5, newRenoDataCwnd2_6 = splitCWND(newRenoData)
+    vegasDataCwnd1_5, vegasDataCwnd2_6 = splitCWND(vegasData)
+    tahoeDataCwnd1_5, tahoeDataCwnd2_6 = splitCWND(tahoeData)
 
-    for i in range(1001):
-        cwndDict04["newreno"][i] += newRenoDataCwnd04[i]
-        cwndDict04["vegas"][i] += vegasDataCwnd04[i]
-        cwndDict04["tahoe"][i] += tahoeDataCwnd04[i]
-        cwnd_2_to_6["newreno"][i] += newRenoDataCwnd15[i]
-        cwnd_2_to_6["vegas"][i] += vegasDataCwnd15[i]
-        cwnd_2_to_6["tahoe"][i] += tahoeDataCwnd15[i]
+    for i in range(size):
+        cwndDict1_5["newreno"][i] += newRenoDataCwnd1_5[i]
+        cwndDict1_5["vegas"][i] += vegasDataCwnd1_5[i]
+        cwndDict1_5["tahoe"][i] += tahoeDataCwnd1_5[i]
+        cwndDict2_6["newreno"][i] += newRenoDataCwnd2_6[i]
+        cwndDict2_6["vegas"][i] += vegasDataCwnd2_6[i]
+        cwndDict2_6["tahoe"][i] += tahoeDataCwnd2_6[i]
 
 
 def addGoodputDatas(newRenoData, vegasData, tahoeData):
-    global goodputDict04, goodputDict15
-    newRenoDataAcks04, newRenoDataAcks15 = splitAcks(newRenoData)
-    vegasDataAcks04, vegasDataAcks15 = splitAcks(vegasData)
-    tahoeDataAcks04, tahoeDataAcks15 = splitAcks(tahoeData)
+    global goodputDict1_5, goodputDict2_6
+    newRenoDataAcks1_5, newRenoDataAcks2_6 = splitAcks(newRenoData)
+    vegasDataAcks1_5, vegasDataAcks2_6 = splitAcks(vegasData)
+    tahoeDataAcks1_5, tahoeDataAcks2_6 = splitAcks(tahoeData)
 
-    for i in range(1001):
-        goodputDict04["newreno"][i] += newRenoDataAcks04[i]
-        goodputDict04["vegas"][i] += vegasDataAcks04[i]
-        goodputDict04["tahoe"][i] += tahoeDataAcks04[i]
-        goodputDict15["newreno"][i] += newRenoDataAcks15[i]
-        goodputDict15["vegas"][i] += vegasDataAcks15[i]
-        goodputDict15["tahoe"][i] += tahoeDataAcks15[i]
+    for i in range(size):
+        goodputDict1_5["newreno"][i] += newRenoDataAcks1_5[i]
+        goodputDict1_5["vegas"][i] += vegasDataAcks1_5[i]
+        goodputDict1_5["tahoe"][i] += tahoeDataAcks1_5[i]
+        goodputDict2_6["newreno"][i] += newRenoDataAcks2_6[i]
+        goodputDict2_6["vegas"][i] += vegasDataAcks2_6[i]
+        goodputDict2_6["tahoe"][i] += tahoeDataAcks2_6[i]
 
 def addRttDatas(newRenoData, vegasData, tahoeData):
-    global rttDict04, rttDict15
-    newRenoDataRtt04, newRenoDataRtt15 = splitRtt(newRenoData)
-    vegasDataRtt04, vegasDataRtt15 = splitRtt(vegasData)
-    tahoeDataRtt04, tahoeDataRtt15 = splitRtt(tahoeData)
+    global rttDict1_5, rttDict2_6
+    newRenoDataRtt1_5, newRenoDataRtt2_6 = splitRtt(newRenoData)
+    vegasDataRtt1_5, vegasDataRtt2_6 = splitRtt(vegasData)
+    tahoeDataRtt1_5, tahoeDataRtt2_6 = splitRtt(tahoeData)
 
-    for i in range(1001):
-        rttDict04["newreno"][i] += newRenoDataRtt04[i]
-        rttDict04["vegas"][i] += vegasDataRtt04[i]
-        rttDict04["tahoe"][i] += tahoeDataRtt04[i]
-        rttDict15["newreno"][i] += newRenoDataRtt15[i]
-        rttDict15["vegas"][i] += vegasDataRtt15[i]
-        rttDict15["tahoe"][i] += tahoeDataRtt15[i]
+    for i in range(size):
+        rttDict1_5["newreno"][i] += newRenoDataRtt1_5[i]
+        rttDict1_5["vegas"][i] += vegasDataRtt1_5[i]
+        rttDict1_5["tahoe"][i] += tahoeDataRtt1_5[i]
+        rttDict2_6["newreno"][i] += newRenoDataRtt2_6[i]
+        rttDict2_6["vegas"][i] += vegasDataRtt2_6[i]
+        rttDict2_6["tahoe"][i] += tahoeDataRtt2_6[i]
 
 def addLostDatas(newRenoData, vegasData, tahoeData):
-    global lostDict04, lostDict15
-    newRenoDataLost04, newRenoDataLost15 = splitLost(newRenoData)
-    vegasDataLost04, vegasDataLost15 = splitLost(vegasData)
-    tahoeDataLost04, tahoeDataLost15 = splitLost(tahoeData)
+    global lostDict1_5, lostDict2_6
+    newRenoDataLost1_5, newRenoDataLost2_6 = splitLost(newRenoData)
+    vegasDataLost1_5, vegasDataLost2_6 = splitLost(vegasData)
+    tahoeDataLost1_5, tahoeDataLost2_6 = splitLost(tahoeData)
 
-    for i in range(1001):
-        lostDict04["newreno"][i] += newRenoDataLost04[i]
-        lostDict04["vegas"][i] += vegasDataLost04[i]
-        lostDict04["tahoe"][i] += tahoeDataLost04[i]
-        lostDict15["newreno"][i] += newRenoDataLost15[i]
-        lostDict15["vegas"][i] += vegasDataLost15[i]
-        lostDict15["tahoe"][i] += tahoeDataLost15[i]
+    for i in range(size):
+        lostDict1_5["newreno"][i] += newRenoDataLost1_5[i]
+        lostDict1_5["vegas"][i] += vegasDataLost1_5[i]
+        lostDict1_5["tahoe"][i] += tahoeDataLost1_5[i]
+        lostDict2_6["newreno"][i] += newRenoDataLost2_6[i]
+        lostDict2_6["vegas"][i] += vegasDataLost2_6[i]
+        lostDict2_6["tahoe"][i] += tahoeDataLost2_6[i]
 
-def runOneEpoch():
+def runOnce():
     os.system("ns tahoe_tcp.tcl")
     os.system("ns vegas_tcp.tcl")
     os.system("ns newreno_tcp.tcl")
@@ -149,41 +155,44 @@ def runOneEpoch():
     addRttDatas(newRenoData, vegasData, tahoeData)
     addLostDatas(newRenoData, vegasData, tahoeData)
 
-def calcAvgVars():
-    global cwndDict04, cwnd_2_to_6, goodputDict04, goodputDict15
-    for key in cwndDict04:
-        for i in range(1001):
-            cwndDict04[key][i] /= 10
-            cwnd_2_to_6[key][i] /= 10
-            goodputDict04[key][i] /= 10
-            goodputDict15[key][i] /= 10
-            rttDict04[key][i] /= 10
-            rttDict15[key][i] /= 10
-            lostDict04[key][i] /= 10
-            lostDict15[key][i] /= 10
-
-def derivate(arr):
-    arr2 = [0] * len(arr)
-    for i in range(1, len(arr)):
-        arr2[i] = arr[i] / i
-    arr2[0] = arr[0]
-    return arr2
-
-
-
 def run():
     for i in range(10):
-        print("Epoch: ", i, " started")
-        runOneEpoch()
-    calcAvgVars()
+        print("run Num #",i+1,)
+        runOnce()
+    Avrage()
 
-def analyzeCWND():
-    global cwndDict04, cwnd_2_to_6
-    colors = ['y', 'r', 'c', 'g', 'b', 'm']
-    for key in cwndDict04.keys():
-        plt.plot(range(1001), cwndDict04[key], label=key+'04', c=colors[-1])
+
+def Avrage():
+    global cwndDict1_5, cwndDict2_6, goodputDict1_5, goodputDict2_6
+    for key in cwndDict1_5:
+        for i in range(size):
+            cwndDict1_5[key][i] /= 10
+            cwndDict2_6[key][i] /= 10
+            goodputDict1_5[key][i] /= 10
+            goodputDict2_6[key][i] /= 10
+            rttDict1_5[key][i] /= 10
+            rttDict2_6[key][i] /= 10
+            lostDict1_5[key][i] /= 10
+            lostDict2_6[key][i] /= 10
+
+def divide_by_index(arr):
+    res = [0] * len(arr)
+    res[0] = arr[0]
+    for i in range(1, len(arr)):
+        res[i] = arr[i] / i
+    
+    return res
+
+
+
+
+def CwndDiagram():
+    global cwndDict1_5, cwndDict2_6
+    colors = ['c', 'm', 'y', 'g', 'b', 'r']
+    for key in cwndDict1_5.keys():
+        plt.plot(range(size), cwndDict1_5[key], label=key+'1_5', c=colors[-1])
         colors.pop()
-        plt.plot(range(1001), cwnd_2_to_6[key], label=key+'15', c=colors[-1])
+        plt.plot(range(size), cwndDict2_6[key], label=key+'2_6', c=colors[-1])
         colors.pop()
 
     plt.xlabel("Time")
@@ -194,13 +203,13 @@ def analyzeCWND():
 
 
 
-def analyzeRTT():
-    global rttDict04, rttDict15
-    colors = ['y', 'r', 'c', 'g', 'b', 'm']
-    for key in rttDict04.keys():
-        plt.plot(range(1001), rttDict04[key], label=key+'04', c=colors[-1])
+def RttDiagram():
+    global rttDict1_5, rttDict2_6
+    colors = ['c', 'm', 'y', 'g', 'b', 'r']
+    for key in rttDict1_5.keys():
+        plt.plot(range(size), rttDict1_5[key], label=key+'1_5', c=colors[-1])
         colors.pop()
-        plt.plot(range(1001), rttDict15[key], label=key+'15', c=colors[-1])
+        plt.plot(range(size), rttDict2_6[key], label=key+'2_6', c=colors[-1])
         colors.pop()
 
     plt.xlabel("Time")
@@ -209,13 +218,13 @@ def analyzeRTT():
     plt.legend()
     plt.show()
 
-def analyzeGoodput():
-    global goodputDict04, goodputDict15
-    colors = ['y', 'r', 'c', 'g', 'b', 'm']
-    for key in goodputDict04.keys():
-        plt.plot(range(1001),derivate(goodputDict04[key]), label=key+'04', c=colors[-1])
+def GPDiagram():
+    global goodputDict1_5, goodputDict2_6
+    colors = ['c', 'm', 'y', 'g', 'b', 'r']
+    for key in goodputDict1_5.keys():
+        plt.plot(range(size),divide_by_index(goodputDict1_5[key]), label=key+'1_5', c=colors[-1])
         colors.pop()
-        plt.plot(range(1001), derivate(goodputDict15[key]), label=key+'15', c=colors[-1])
+        plt.plot(range(size), divide_by_index(goodputDict2_6[key]), label=key+'2_6', c=colors[-1])
         colors.pop()
 
     plt.xlabel("Time")
@@ -224,13 +233,13 @@ def analyzeGoodput():
     plt.legend()
     plt.show()
 
-def analyzeLost():
-    global lostDict04, lostDict15
-    colors = ['y', 'r', 'c', 'g', 'b', 'm']
-    for key in lostDict04.keys():
-        plt.plot(range(1001), derivate(lostDict04[key]), label=key+'04', c=colors[-1])
+def LossDiagram():
+    global lostDict1_5, lostDict2_6
+    colors = ['c', 'm', 'y', 'g', 'b', 'r']
+    for key in lostDict1_5.keys():
+        plt.plot(range(size), divide_by_index(lostDict1_5[key]), label=key+'1_5', c=colors[-1])
         colors.pop()
-        plt.plot(range(1001), derivate(lostDict15[key]), label=key+'15', c=colors[-1])
+        plt.plot(range(size), divide_by_index(lostDict2_6[key]), label=key+'2_6', c=colors[-1])
         colors.pop()
 
     plt.xlabel("Time")
@@ -241,7 +250,7 @@ def analyzeLost():
 
 
 run()
-analyzeCWND()
-analyzeRTT()
-analyzeGoodput()
-analyzeLost()
+CwndDiagram()
+RttDiagram()
+GPDiagram()
+LossDiagram()
