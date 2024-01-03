@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from math import ceil
 import os
 
-cwndDict15 = {"newreno": [0] * 1001, "vegas": [0] * 1001, "tahoe": [0] * 1001}
+cwnd_2_to_6 = {"newreno": [0] * 1001, "vegas": [0] * 1001, "tahoe": [0] * 1001}
 cwndDict04 = {"newreno": [0] * 1001, "vegas": [0] * 1001, "tahoe": [0] * 1001}
 goodputDict04 = {"newreno": [0] * 1001, "vegas": [0] * 1001, "tahoe": [0] * 1001}
 goodputDict15 = {"newreno": [0] * 1001, "vegas": [0] * 1001, "tahoe": [0] * 1001}
@@ -79,7 +79,7 @@ def splitRtt(data):
     return adjustArray(rtt04, -1), adjustArray(rtt15, -1)
 
 def addCwndDatas(newRenoData, vegasData, tahoeData):
-    global cwndDict04, cwndDict15
+    global cwndDict04, cwnd_2_to_6
     newRenoDataCwnd04, newRenoDataCwnd15 = splitCWND(newRenoData)
     vegasDataCwnd04, vegasDataCwnd15 = splitCWND(vegasData)
     tahoeDataCwnd04, tahoeDataCwnd15 = splitCWND(tahoeData)
@@ -88,9 +88,9 @@ def addCwndDatas(newRenoData, vegasData, tahoeData):
         cwndDict04["newreno"][i] += newRenoDataCwnd04[i]
         cwndDict04["vegas"][i] += vegasDataCwnd04[i]
         cwndDict04["tahoe"][i] += tahoeDataCwnd04[i]
-        cwndDict15["newreno"][i] += newRenoDataCwnd15[i]
-        cwndDict15["vegas"][i] += vegasDataCwnd15[i]
-        cwndDict15["tahoe"][i] += tahoeDataCwnd15[i]
+        cwnd_2_to_6["newreno"][i] += newRenoDataCwnd15[i]
+        cwnd_2_to_6["vegas"][i] += vegasDataCwnd15[i]
+        cwnd_2_to_6["tahoe"][i] += tahoeDataCwnd15[i]
 
 
 def addGoodputDatas(newRenoData, vegasData, tahoeData):
@@ -150,11 +150,11 @@ def runOneEpoch():
     addLostDatas(newRenoData, vegasData, tahoeData)
 
 def calcAvgVars():
-    global cwndDict04, cwndDict15, goodputDict04, goodputDict15
+    global cwndDict04, cwnd_2_to_6, goodputDict04, goodputDict15
     for key in cwndDict04:
         for i in range(1001):
             cwndDict04[key][i] /= 10
-            cwndDict15[key][i] /= 10
+            cwnd_2_to_6[key][i] /= 10
             goodputDict04[key][i] /= 10
             goodputDict15[key][i] /= 10
             rttDict04[key][i] /= 10
@@ -178,12 +178,12 @@ def run():
     calcAvgVars()
 
 def analyzeCWND():
-    global cwndDict04, cwndDict15
-    colors = ['c', 'm', 'y', 'g', 'b', 'r']
+    global cwndDict04, cwnd_2_to_6
+    colors = ['y', 'r', 'c', 'g', 'b', 'm']
     for key in cwndDict04.keys():
         plt.plot(range(1001), cwndDict04[key], label=key+'04', c=colors[-1])
         colors.pop()
-        plt.plot(range(1001), cwndDict15[key], label=key+'15', c=colors[-1])
+        plt.plot(range(1001), cwnd_2_to_6[key], label=key+'15', c=colors[-1])
         colors.pop()
 
     plt.xlabel("Time")
@@ -196,7 +196,7 @@ def analyzeCWND():
 
 def analyzeRTT():
     global rttDict04, rttDict15
-    colors = ['c', 'm', 'y', 'g', 'b', 'r']
+    colors = ['y', 'r', 'c', 'g', 'b', 'm']
     for key in rttDict04.keys():
         plt.plot(range(1001), rttDict04[key], label=key+'04', c=colors[-1])
         colors.pop()
@@ -211,7 +211,7 @@ def analyzeRTT():
 
 def analyzeGoodput():
     global goodputDict04, goodputDict15
-    colors = ['c', 'm', 'y', 'g', 'b', 'r']
+    colors = ['y', 'r', 'c', 'g', 'b', 'm']
     for key in goodputDict04.keys():
         plt.plot(range(1001),derivate(goodputDict04[key]), label=key+'04', c=colors[-1])
         colors.pop()
@@ -226,7 +226,7 @@ def analyzeGoodput():
 
 def analyzeLost():
     global lostDict04, lostDict15
-    colors = ['c', 'm', 'y', 'g', 'b', 'r']
+    colors = ['y', 'r', 'c', 'g', 'b', 'm']
     for key in lostDict04.keys():
         plt.plot(range(1001), derivate(lostDict04[key]), label=key+'04', c=colors[-1])
         colors.pop()
